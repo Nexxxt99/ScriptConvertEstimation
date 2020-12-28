@@ -1,7 +1,7 @@
 package ru.sce.parser;
 
-import java.util.List;
+import ru.sce.data.SQLDefinition;
 
 public interface Parser {
-    List<String> parse(String sqlString);
+    SQLDefinition parse(String sqlString);
 }

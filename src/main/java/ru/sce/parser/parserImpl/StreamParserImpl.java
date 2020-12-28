@@ -1,5 +1,6 @@
 package ru.sce.parser.parserImpl;
 
+import ru.sce.data.SQLDefinition;
 import ru.sce.parser.Parser;
 
 import java.io.StringReader;
@@ -7,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SimpleParserImpl implements Parser {
+public class StreamParserImpl implements Parser {
 
     char space_token = ' ';
     char new_line_token = '\n';
@@ -18,7 +19,7 @@ public class SimpleParserImpl implements Parser {
     List<String> structureWords = Arrays.asList("select","from","where","group","order");
 
     @Override
-    public List<String> parse(String sqlString) {
+    public SQLDefinition parse(String sqlString) {
 
         List<String> result = new ArrayList<>();
 
@@ -72,7 +73,7 @@ public class SimpleParserImpl implements Parser {
             }
         } catch (Exception e) {}
 
-        return result;
+        return new SQLDefinition();
     }
 
 

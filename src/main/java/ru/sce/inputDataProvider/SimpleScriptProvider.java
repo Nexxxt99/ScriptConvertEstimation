@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 
-public class SimpleTextScriptProvider implements ScriptProvider{
+public class SimpleScriptProvider implements ScriptProvider{
     @Override
     public String getScript(){
             return "select d.dname as department, count(e.empno) as total_employees, " +
