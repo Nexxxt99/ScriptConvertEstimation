@@ -19,21 +19,29 @@ public class StreamParserImpl implements Parser {
 
         StringReader reader = new StringReader(Utils.replaceNewLineToken(sqlString,Tokens.SPACE_TOKEN));
         try {
-            int c;
+            int c = 0;
 
-            while ((c = reader.read()) != -1) {
+            while (c != -1) {
+                c = reader.read();
                 char sym = (char) c;
 
                 sym = spaceTokenProc(sym);
                 sym = commaTokenProc(sym);
                 sym = bracketTokenProc(sym);
-
+                sym = endTokenProc(sym);
                 phraseBuilder.append(sym);
             }
         } catch (Exception e) {
         }
 
         return result;
+    }
+
+    private char endTokenProc(char sym){
+        if (sym == Tokens.END_STRING_TOKEN){
+            result.add(ctx,phraseBuilder.toString());
+        }
+        return sym;
     }
 
     private char bracketTokenProc(char sym) {

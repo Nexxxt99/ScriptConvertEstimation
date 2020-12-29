@@ -7,6 +7,8 @@ import java.util.Map;
 
 public class ExpressionsScorerImpl implements Scorer {
 
+    /*TODO add recursive expression scorer + cte*/
+
     private Map<String,Integer> ORACLE_SPEC_EXPRESSIONS = new HashMap<>(){{
         put("to_date",10);
         put("to_char",7);

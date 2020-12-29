@@ -6,6 +6,7 @@ public class Tokens {
     static char COMMA_TOKEN = ',';
     static char OPEN_BRACKET_TOKEN = '(';
     static char CLOSE_BRACKET_TOKEN = ')';
+    static char END_STRING_TOKEN = (char) -1;
     static char QUOTE_TOKEN = '\'';
     static char DOUBLE_QUOTE_TOKEN = '\"';
 }

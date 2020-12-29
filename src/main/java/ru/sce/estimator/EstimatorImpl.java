@@ -29,16 +29,16 @@ public class EstimatorImpl implements Estimator {
     }
 
     private int scoreTables(SQLDefinition def) {
-        return score(tableScorer, def.expressions);
+        return score(tableScorer, def.tables);
     }
 
     private int scorePredicates(SQLDefinition def) {
-        return score(predicateScorer, def.expressions);
+        return score(predicateScorer, def.predicates);
     }
 
     private int score(Scorer scorer, List<String> expressions) {
         int result = 0;
-        if (scorer != null)
+        if (scorer != null && expressions != null)
             for (String expr : expressions)
                 result += scorer.score(expr);
 
