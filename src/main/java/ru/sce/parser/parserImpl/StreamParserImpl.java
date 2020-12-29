@@ -4,77 +4,75 @@ import ru.sce.data.SQLDefinition;
 import ru.sce.parser.Parser;
 
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class StreamParserImpl implements Parser {
 
-    char space_token = ' ';
-    char new_line_token = '\n';
-    char comma_token = ',';
-    char open_bracket_token = '(';
-    char close_bracket_token = ')';
+    private int openBrCn = 0;
+    private int lastPos = 0;
 
-    List<String> structureWords = Arrays.asList("select","from","where","group","order");
+    private String ctx = null;
+    private StringBuilder phraseBuilder = new StringBuilder();
+    private SQLDefinition result = new SQLDefinition();
 
     @Override
     public SQLDefinition parse(String sqlString) {
 
-        List<String> result = new ArrayList<>();
-
-        StringReader reader = new StringReader(sqlString.replace(new_line_token,space_token));
-        int c;
-
-        StringBuilder phraseBuilder = new StringBuilder();
-        StringBuilder wordBuilder = new StringBuilder();
-
-        int pos = 0;
+        StringReader reader = new StringReader(Utils.replaceNewLineToken(sqlString,Tokens.SPACE_TOKEN));
         try {
+            int c;
+
             while ((c = reader.read()) != -1) {
                 char sym = (char) c;
 
-                if (sym == space_token || sym == new_line_token) {
-                    if (structureWords.contains(wordBuilder.toString().toLowerCase().trim())){
-                        result.add(phraseBuilder.toString());
-                        phraseBuilder.setLength(0);
+                sym = spaceTokenProc(sym);
+                sym = commaTokenProc(sym);
+                sym = bracketTokenProc(sym);
 
-                        result.add(wordBuilder.toString());
-
-                    } else {
-                        phraseBuilder.append(wordBuilder.toString());
-                    }
-                    wordBuilder.setLength(0);
-                } else if (sym == open_bracket_token){
-                    int cn = 0;
-                    while (true){
-                        if (sym == open_bracket_token)
-                            cn++;
-                        if (sym == close_bracket_token)
-                            cn--;
-
-                        wordBuilder.append(sym);
-                        sym = (char) reader.read();
-                        pos++;
-                        if (cn == 0)
-                            break;
-
-                    }
-                } else if (sym == comma_token){
-                    phraseBuilder.append(wordBuilder.toString());
-                    result.add(phraseBuilder.toString());
-                    phraseBuilder.setLength(0);
-                    wordBuilder.setLength(0);
-                    continue;
-                }
-
-                wordBuilder.append(sym);
-                pos++;
+                phraseBuilder.append(sym);
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
-        return new SQLDefinition();
+        return result;
     }
 
+    private char bracketTokenProc(char sym) {
+        if (sym == Tokens.OPEN_BRACKET_TOKEN) {
+            openBrCn++;
+        } else if (sym == Tokens.CLOSE_BRACKET_TOKEN) {
+            openBrCn--;
+        }
+        return sym;
+    }
 
+    private char spaceTokenProc(char sym) {
+        char res = sym;
+        if (openBrCn == 0 && sym == Tokens.SPACE_TOKEN) {
+            String word = phraseBuilder.substring(lastPos).trim().toLowerCase();
+
+            if (word.length() > 0) {
+                if (SQLReservedWords.isReservedWord(word)) {
+                    result.add(ctx, phraseBuilder.substring(0, lastPos));
+                    phraseBuilder.setLength(0);
+                    ctx = word;
+                    res = (char) 0;
+                }
+            } else {
+                res = (char) 0;
+            }
+
+            lastPos = phraseBuilder.length();
+        }
+        return res;
+    }
+
+    private char commaTokenProc(char sym) {
+        if (openBrCn == 0 && sym == Tokens.COMMA_TOKEN) {
+            result.add(ctx, phraseBuilder.toString());
+            phraseBuilder.setLength(0);
+            lastPos = phraseBuilder.length();
+            return (char) 0;
+        }
+        return sym;
+    }
 }
